@@ -157,6 +157,27 @@ class Score :
         self.img = self.fonto.render(f"Score:{self.score}", 0,self.color)
         screen.blit(self.img, self.rct)
 
+class Explosion:
+    """
+    爆発エフェクトのクラス
+    引数1: bomb: 爆発する爆弾のインスタンス
+    引数2: life: 爆発の表示時間
+    """
+    def __init__(self, bomb: Bomb,life: int):
+        img = pg.image.load("fig/explosion.gif")
+        self.imgs = [img, pg.transform.flip(img, True,True)]
+        self.img = self.imgs[0]
+        self.rct = self.img.get_rect()
+        self.rct.center = bomb.rct.center
+        self.life = life
+    def update (self, screen: pg.Surface):
+        """
+        爆発時間を軽減して画像を交互に切り替えて描画する
+        """
+        self.life -= 1
+        self.img = self.imgs[self.life // 5 % 2]
+        screen.blit(self.img, self.rct)
+
 
 
 
@@ -174,6 +195,7 @@ def main():
         bombs.append(bomb)
     beam = None  # ゲーム初期化時にはビームは存在しない
     beams = []
+    explosions = []
     score = Score()
     clock = pg.time.Clock()
     tmr = 0
@@ -200,8 +222,10 @@ def main():
                 
         for i, bomb in enumerate(bombs): #練習2爆弾とビームの衝突判定
                 for j, beam in enumerate(beams):
-                    if beam is not None and beam is not None:
-                        if beam.rct.colliderect(bomb.rct):   
+                    if bomb is not None and beam is not None:
+                        if beam.rct.colliderect(bomb.rct): 
+                            explosions.append(Explosion(bomb, 50))
+
                             beams[j] = None
                             bombs[i] = None
                             bird.change_img(6, screen)
@@ -213,6 +237,7 @@ def main():
 
         bombs = [bomb for bomb in bombs if bomb is not None] #練習5
         beams = [beam for beam in beams if beam is not None and check_bound(beam.rct) == (True, True)] 
+        explosions = [exp for exp in explosions if exp.life > 0]
                     
         key_lst = pg.key.get_pressed()
         bird.update(key_lst,  screen)
@@ -221,6 +246,8 @@ def main():
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
+        for exp in explosions:
+            exp.update(screen)
         
         score.update(screen)
 
