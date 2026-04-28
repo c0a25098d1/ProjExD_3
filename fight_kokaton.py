@@ -164,7 +164,7 @@ def main():
                 pg.display.update()
                 time.sleep(1)
                 return
-        if bomb is not None: #練習2爆弾とビームの衝突判定
+        if bomb is not None: #練習2爆弾とビームの衝突判定.
             if beam is not None:
                 if beam.rct.colliderect(bomb.rct):   
                     beam = None
