@@ -138,6 +138,28 @@ class Bomb:
             self.vy *= -1
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
+class Score :
+    """
+    スコアのクラス
+    """
+    def __init__(self):
+        self.fonto = pg.font.SysFont(None,30)
+        self.color = (0, 0, 255)
+        self.score = 0
+        self.img = self.fonto.render(f"Score:{self.score}",0, self.color)
+        self.rct = self.img.get_rect()
+        self.rct.center = (100, HEIGHT - 50)
+    def update (self, screen: pg.Surface):
+        """
+        スコアを表示させる関数
+        引数:screen 画面:surface
+        """
+        self.img = self.fonto.render(f"Score:{self.score}", 0,self.color)
+        screen.blit(self.img, self.rct)
+
+
+
+
 
 
 def main():
@@ -151,6 +173,7 @@ def main():
         bomb = Bomb((255, 0, 0), 10)
         bombs.append(bomb)
     beam = None  # ゲーム初期化時にはビームは存在しない
+    score = Score()
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -182,6 +205,10 @@ def main():
                         pg.display.update()
                         time.sleep(1)
 
+                        score.score += 1
+                        pg.display.update()
+                        time.sleep(1)
+
         bombs = [bomb for bomb in bombs if bomb is not None] #練習5
                     
         key_lst = pg.key.get_pressed()
@@ -191,6 +218,9 @@ def main():
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
+        
+        score.update(screen)
+
         pg.display.update()
         tmr += 1
         clock.tick(50)
