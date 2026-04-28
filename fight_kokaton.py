@@ -173,6 +173,7 @@ def main():
         bomb = Bomb((255, 0, 0), 10)
         bombs.append(bomb)
     beam = None  # ゲーム初期化時にはビームは存在しない
+    beams = []
     score = Score()
     clock = pg.time.Clock()
     tmr = 0
@@ -182,7 +183,7 @@ def main():
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                beams.append(Beam(bird))           
         screen.blit(bg_img, [0, 0])
 
         for bomb in bombs:
@@ -196,25 +197,27 @@ def main():
                     pg.display.update()
                     time.sleep(1)
                     return
+                
         for i, bomb in enumerate(bombs): #練習2爆弾とビームの衝突判定
-                if beam is not None:
-                    if beam.rct.colliderect(bomb.rct):   
-                        beam = None
-                        bombs[i] = None
-                        bird.change_img(6, screen)
-                        pg.display.update()
-                        time.sleep(1)
-
-                        score.score += 1
-                        pg.display.update()
-                        time.sleep(1)
+                for j, beam in enumerate(beams):
+                    if beam is not None and beam is not None:
+                        if beam.rct.colliderect(bomb.rct):   
+                            beams[j] = None
+                            bombs[i] = None
+                            bird.change_img(6, screen)
+                            pg.display.update()
+                            time.sleep(1)
+                            score.score += 1
+                        #pg.display.update()
+                        #time.sleep(1)
 
         bombs = [bomb for bomb in bombs if bomb is not None] #練習5
+        beams = [beam for beam in beams if beam is not None and check_bound(beam.rct) == (True, True)] 
                     
         key_lst = pg.key.get_pressed()
         bird.update(key_lst,  screen)
 
-        if beam is not None:
+        for beam in beams:
             beam.update(screen)   
         for bomb in bombs:
             bomb.update(screen)
